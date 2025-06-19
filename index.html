@@ -55,15 +55,15 @@
       const teacher = document.getElementById("teacher").value;
       const section = document.getElementById("section").value;
 
-      // Section name (larger, on top)
+      // Section name (slightly smaller than before)
       ctx.fillStyle = "white";
-      ctx.font = "bold 112px Helvetica";
       ctx.textAlign = "center";
-      ctx.fillText(section, canvas.width / 2, 730); // Adjust Y as needed
 
-      // Teacher name (smaller, below)
+      ctx.font = "bold 78px Helvetica"; // 30% smaller than 112px
+      ctx.fillText(section, canvas.width / 2, 760); // Adjusted Y for better balance
+
       ctx.font = "bold 28px Helvetica";
-      ctx.fillText(teacher, canvas.width / 2, 810); // Adjust Y as needed
+      ctx.fillText(teacher, canvas.width / 2, 800); // Moved teacher name slightly closer
     }
 
     async function generatePDF() {
