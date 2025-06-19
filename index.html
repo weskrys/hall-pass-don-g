@@ -13,6 +13,7 @@
       margin-bottom: 10px;
       padding: 5px;
       font-size: 14px;
+      width: 300px;
     }
     button {
       padding: 10px 15px;
@@ -22,11 +23,14 @@
     }
     canvas {
       border: 1px solid #ccc;
+      display: block;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <h2>HALL PASS Generator</h2>
+
   <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" oninput="updatePreview()" /></label><br />
   <label>Section Name: <input type="text" id="section" value="12 GAS A" oninput="updatePreview()" /></label><br />
   <button onclick="generatePDF()">Generate PDF</button>
@@ -38,38 +42,47 @@
     const canvas = document.getElementById("previewCanvas");
     const ctx = canvas.getContext("2d");
     const bgImg = new Image();
-    bgImg.src = "hall-pass-bg-a.png"; // Make sure this matches your uploaded file name
+    bgImg.src = "hall-pass-bg-a.png"; // Make sure this file is in the same directory
 
     bgImg.onload = () => {
       updatePreview();
     };
 
     function updatePreview() {
-      // Clear and draw background
+      // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background image
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
+      // Get input values
       const teacher = document.getElementById("teacher").value;
       const section = document.getElementById("section").value;
       const label = `${teacher} - ${section}`;
 
-      // Draw text on black box
+      // Set text style
       ctx.fillStyle = "white";
       ctx.font = "bold 28px Helvetica";
       ctx.textAlign = "center";
-      ctx.fillText(label, canvas.width / 2, 810); // Adjust Y if needed
+
+      // Draw text on black bar (adjust Y if needed)
+      ctx.fillText(label, canvas.width / 2, 810);
     }
 
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
+
+      const pdfWidth = 595;
+      const pdfHeight = 842;
+
       const doc = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: "a4",
+        format: [pdfWidth, pdfHeight]
       });
 
       const imgData = canvas.toDataURL("image/png");
-      doc.addImage(imgData, "PNG", 0, 0, 595, 842); // A4 size
+      doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       doc.save("hall-pass.pdf");
     }
   </script>
