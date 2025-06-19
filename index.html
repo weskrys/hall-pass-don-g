@@ -31,7 +31,7 @@
 <body>
   <h2>HALL PASS Generator</h2>
 
-  <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" oninput="updatePreview()" /></label><br />
+  <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmediana" oninput="updatePreview()" /></label><br />
   <label>Section Name: <input type="text" id="section" value="12 GAS A" oninput="updatePreview()" /></label><br />
   <button onclick="generatePDF()">Generate PDF</button>
 
@@ -42,36 +42,32 @@
     const canvas = document.getElementById("previewCanvas");
     const ctx = canvas.getContext("2d");
     const bgImg = new Image();
-    bgImg.src = "hall-pass-bg-a.png"; // Make sure this file is in the same directory
+    bgImg.src = "hall-pass-bg-a.png"; // Ensure this file exists in the same directory
 
     bgImg.onload = () => {
       updatePreview();
     };
 
     function updatePreview() {
-      // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw background image
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-      // Get input values
       const teacher = document.getElementById("teacher").value;
       const section = document.getElementById("section").value;
-      const label = `${teacher} - ${section}`;
 
-      // Set text style
+      // Section name (larger, on top)
       ctx.fillStyle = "white";
-      ctx.font = "bold 28px Helvetica";
+      ctx.font = "bold 112px Helvetica";
       ctx.textAlign = "center";
+      ctx.fillText(section, canvas.width / 2, 730); // Adjust Y as needed
 
-      // Draw text on black bar (adjust Y if needed)
-      ctx.fillText(label, canvas.width / 2, 810);
+      // Teacher name (smaller, below)
+      ctx.font = "bold 28px Helvetica";
+      ctx.fillText(teacher, canvas.width / 2, 810); // Adjust Y as needed
     }
 
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
-
       const pdfWidth = 595;
       const pdfHeight = 842;
 
