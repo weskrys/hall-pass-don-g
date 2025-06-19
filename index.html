@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
+            margin: 20px;
         }
         input {
             margin-bottom: 10px;
@@ -23,26 +23,44 @@
 </head>
 <body>
     <h2>HALL PASS Generator</h2>
-    <label>Name: <input type="text" id="name" /></label><br />
-    <label>Section: <input type="text" id="section" value="11-ABN" /></label><br />
+    <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" /></label><br />
+    <label>Section Name: <input type="text" id="section" value="12 GAS A" /></label><br />
     <button onclick="generatePDF()">Generate PDF</button>
 
     <script>
-        function generatePDF() {
+        async function generatePDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: 'a4'
+            });
 
-            const name = document.getElementById("name").value;
-            const section = document.getElementById("section").value;
+            // Load the background image
+            const img = new Image();
+            img.src = 'hall-pass-bg-a.png';
 
-            doc.setFontSize(22);
-            doc.text("HALL PASS", 20, 30);
+            img.onload = function() {
+                // Add image as background
+                doc.addImage(img, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
 
-            doc.setFontSize(16);
-            doc.text(`Name: ${name}`, 20, 50);
-            doc.text(`Section: ${section}`, 20, 65);
+                // Get input values
+                const teacher = document.getElementById("teacher").value;
+                const section = document.getElementById("section").value;
 
-            doc.save("hall-pass.pdf");
+                // Set text font and size
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(18);
+
+                // Position the teacher name (adjust X, Y to match your image layout)
+                doc.text(`Teacher: ${teacher}`, 60, 700);
+
+                // Position the section name (adjust X, Y to match your image layout / box at bottom)
+                doc.text(`Section: ${section}`, 60, 740);
+
+                // Save PDF
+                doc.save("hall-pass.pdf");
+            };
         }
     </script>
 </body>
