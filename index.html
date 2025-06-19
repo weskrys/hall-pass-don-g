@@ -1,77 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>HALL PASS Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        input {
-            margin-bottom: 10px;
-            padding: 5px;
-            font-size: 14px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>HALL PASS Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input {
+      margin-bottom: 10px;
+      padding: 5px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <h2>HALL PASS Generator</h2>
-    <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" /></label><br />
-    <label>Section Name: <input type="text" id="section" value="12 GAS A" /></label><br />
-    <button onclick="generatePDF()">Generate PDF</button>
+  <h2>HALL PASS Generator</h2>
+  <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" oninput="updatePreview()" /></label><br />
+  <label>Section Name: <input type="text" id="section" value="12 GAS A" oninput="updatePreview()" /></label><br />
+  <button onclick="generatePDF()">Generate PDF</button>
 
-    <script>
-    async function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'px',
-            format: 'a4'
-        });
+  <h3>Live Preview:</h3>
+  <canvas id="previewCanvas" width="595" height="842"></canvas>
 
-        // Load the background image
-        const img = new Image();
-        img.src = 'hall-pass-bg-a.png'; // Make sure the uploaded image matches this name or use the uploaded path
+  <script>
+    const canvas = document.getElementById("previewCanvas");
+    const ctx = canvas.getContext("2d");
+    const bgImg = new Image();
+    bgImg.src = "hall-pass-bg-a.png"; // Make sure this matches your uploaded file name
 
-        img.onload = function () {
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
+    bgImg.onload = () => {
+      updatePreview();
+    };
 
-            // Add image as full-page background
-            doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
+    function updatePreview() {
+      // Clear and draw background
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-            // Get input values
-            const teacher = document.getElementById("teacher").value;
-            const section = document.getElementById("section").value;
+      const teacher = document.getElementById("teacher").value;
+      const section = document.getElementById("section").value;
+      const label = `${teacher} - ${section}`;
 
-            // Combine into a single line or two lines as needed
-            const label = `${teacher} - ${section}`;
-
-            // Set text style
-            doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(26); // Make it large
-            doc.setTextColor(255, 255, 255); // White text
-
-            // Calculate text width to center it
-            const textWidth = doc.getTextWidth(label);
-            const x = (pageWidth - textWidth) / 2;
-            const y = 860; // Adjust based on the position of the black bar (test and tweak this)
-
-            // Draw text on black bar
-            doc.text(label, x, y);
-
-            // Save PDF
-            doc.save("hall-pass.pdf");
-        };
+      // Draw text on black box
+      ctx.fillStyle = "white";
+      ctx.font = "bold 28px Helvetica";
+      ctx.textAlign = "center";
+      ctx.fillText(label, canvas.width / 2, 810); // Adjust Y if needed
     }
-</script>
 
+    async function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: "a4",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      doc.addImage(imgData, "PNG", 0, 0, 595, 842); // A4 size
+      doc.save("hall-pass.pdf");
+    }
+  </script>
 </body>
 </html>
