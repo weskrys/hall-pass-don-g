@@ -6,14 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
   <style>
     canvas {
       border: 1px solid #ccc;
       width: 100%;
       height: auto;
     }
-
     @media (min-width: 768px) {
       #previewCanvas {
         width: 60%;
@@ -23,6 +21,7 @@
   </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
+
   <div class="container py-4">
     <h2 class="text-center mb-4">HALL PASS Generator</h2>
 
@@ -175,18 +174,34 @@
 
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
-      const pdfWidth = 595;
-      const pdfHeight = 842;
+
+      const pdfWidth = 1008;  // 14 inches * 72 dpi
+      const pdfHeight = 612;  // 8.5 inches * 72 dpi
+      const margin = 24;
 
       const doc = new jsPDF({
-        orientation: "portrait",
+        orientation: "landscape",
         unit: "px",
         format: [pdfWidth, pdfHeight],
       });
 
       const imgData = canvas.toDataURL("image/png");
-      doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      doc.save("hall-pass.pdf");
+
+      const usableWidth = pdfWidth - margin * 2;
+      const halfWidth = usableWidth / 2;
+      const aspectRatio = canvas.height / canvas.width;
+      const scaledHeight = halfWidth * aspectRatio;
+      const yPos = (pdfHeight - scaledHeight) / 2;
+
+      doc.addImage(imgData, "PNG", margin, yPos, halfWidth, scaledHeight);
+      doc.addImage(imgData, "PNG", margin + halfWidth, yPos, halfWidth, scaledHeight);
+
+      const midX = pdfWidth / 2;
+      doc.setDrawColor(150);
+      doc.setLineDashPattern([4, 4], 0);
+      doc.line(midX, margin, midX, pdfHeight - margin);
+
+      doc.save("hall-pass-legal.pdf");
     }
   </script>
 </body>
