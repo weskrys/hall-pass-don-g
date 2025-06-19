@@ -13,9 +13,12 @@
       width: 100%;
       height: auto;
     }
+
+    /* Desktop scale down */
     @media (min-width: 768px) {
       #previewCanvas {
-        max-width: 595px;
+        width: 60%;
+        height: auto;
       }
     }
   </style>
@@ -126,10 +129,8 @@
       const strand = getSelectedValue("strand");
       const section = getSelectedValue("section");
 
-      // Handle background switch
       const background = grade === "12" ? bgPink : bgGreen;
 
-      // Disable section if ABM is selected
       const sectionRadios = document.querySelectorAll(".section-radio");
       const disableSection = strand === "ABM";
       sectionRadios.forEach(r => {
@@ -137,11 +138,22 @@
         if (disableSection) r.checked = false;
       });
 
-      // Construct label (no section if ABM)
       const sectionLabel = strand === "ABM" ? "" : ` ${section}`;
       const label = `${grade} - ${strand}${sectionLabel}`;
 
-      // Draw to canvas
+      // Font size control
+      let mainFontSize = 78;
+      let teacherFontSize = 28;
+      let labelY = 740;
+      let teacherY = 780;
+
+      if (strand === "HUMSS") {
+        mainFontSize *= 0.9;     // reduce 10%
+        teacherFontSize *= 0.9;  // reduce 10%
+        labelY -= 5;
+        teacherY -= 5;
+      }
+
       if (!background.complete) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -149,11 +161,11 @@
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
 
-      ctx.font = "bold 78px Helvetica"; // Section label
-      ctx.fillText(label, canvas.width / 2, 740);
+      ctx.font = `bold ${mainFontSize}px Helvetica`;
+      ctx.fillText(label, canvas.width / 2, labelY);
 
-      ctx.font = "bold 28px Helvetica"; // Teacher name
-      ctx.fillText(teacher, canvas.width / 2, 780);
+      ctx.font = `bold ${teacherFontSize}px Helvetica`;
+      ctx.fillText(teacher, canvas.width / 2, teacherY);
     }
 
     async function generatePDF() {
