@@ -175,8 +175,8 @@
     async function generatePDF() {
       const { jsPDF } = window.jspdf;
 
-      const pdfWidth = 1008;  // 14 inches * 72 dpi
-      const pdfHeight = 612;  // 8.5 inches * 72 dpi
+      const pdfWidth = 1008;  // 14 in * 72 dpi
+      const pdfHeight = 612;  // 8.5 in * 72 dpi
       const margin = 24;
 
       const doc = new jsPDF({
@@ -189,13 +189,23 @@
 
       const usableWidth = pdfWidth - margin * 2;
       const halfWidth = usableWidth / 2;
+
+      const scale = 0.8; // 80% scaling
+      const scaledWidth = halfWidth * scale;
       const aspectRatio = canvas.height / canvas.width;
-      const scaledHeight = halfWidth * aspectRatio;
+      const scaledHeight = scaledWidth * aspectRatio;
+
+      // Center horizontally within each half page
+      const leftX = margin + (halfWidth - scaledWidth) / 2;
+      const rightX = margin + halfWidth + (halfWidth - scaledWidth) / 2;
+
+      // Vertically centered
       const yPos = (pdfHeight - scaledHeight) / 2;
 
-      doc.addImage(imgData, "PNG", margin, yPos, halfWidth, scaledHeight);
-      doc.addImage(imgData, "PNG", margin + halfWidth, yPos, halfWidth, scaledHeight);
+      doc.addImage(imgData, "PNG", leftX, yPos, scaledWidth, scaledHeight);
+      doc.addImage(imgData, "PNG", rightX, yPos, scaledWidth, scaledHeight);
 
+      // Dashed cut line in middle
       const midX = pdfWidth / 2;
       doc.setDrawColor(150);
       doc.setLineDashPattern([4, 4], 0);
