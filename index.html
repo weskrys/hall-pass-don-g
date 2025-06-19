@@ -14,7 +14,6 @@
       height: auto;
     }
 
-    /* Desktop scale down */
     @media (min-width: 768px) {
       #previewCanvas {
         width: 60%;
@@ -23,7 +22,7 @@
     }
   </style>
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
   <div class="container py-4">
     <h2 class="text-center mb-4">HALL PASS Generator</h2>
 
@@ -104,6 +103,13 @@
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer class="footer mt-auto py-3 bg-light fixed-bottom border-top">
+    <div class="container text-center">
+      <span class="text-muted small">&copy; 2025 Powered by Teacher Krys Espina</span>
+    </div>
+  </footer>
+
   <script>
     const canvas = document.getElementById("previewCanvas");
     const ctx = canvas.getContext("2d");
@@ -141,15 +147,14 @@
       const sectionLabel = strand === "ABM" ? "" : ` ${section}`;
       const label = `${grade} - ${strand}${sectionLabel}`;
 
-      // Font size control
       let mainFontSize = 78;
       let teacherFontSize = 28;
       let labelY = 740;
       let teacherY = 780;
 
       if (strand === "HUMSS") {
-        mainFontSize *= 0.9;     // reduce 10%
-        teacherFontSize *= 0.9;  // reduce 10%
+        mainFontSize *= 0.9;
+        teacherFontSize *= 0.9;
         labelY -= 5;
         teacherY -= 5;
       }
