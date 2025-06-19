@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>HALL PASS Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        input {
+            margin-bottom: 10px;
+            padding: 5px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>HALL PASS Generator</h2>
+    <label>Name: <input type="text" id="name" /></label><br />
+    <label>Section: <input type="text" id="section" value="11-ABN" /></label><br />
+    <button onclick="generatePDF()">Generate PDF</button>
+
+    <script>
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const name = document.getElementById("name").value;
+            const section = document.getElementById("section").value;
+
+            doc.setFontSize(22);
+            doc.text("HALL PASS", 20, 30);
+
+            doc.setFontSize(16);
+            doc.text(`Name: ${name}`, 20, 50);
+            doc.text(`Section: ${section}`, 20, 65);
+
+            doc.save("hall-pass.pdf");
+        }
+    </script>
+</body>
+</html>
