@@ -1,68 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>HALL PASS Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        input {
-            margin-bottom: 10px;
-            padding: 5px;
-            font-size: 14px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <h2>HALL PASS Generator</h2>
-    <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmedaiana" /></label><br />
-    <label>Section Name: <input type="text" id="section" value="12 GAS A" /></label><br />
-    <button onclick="generatePDF()">Generate PDF</button>
+<script>
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            format: 'a4'
+        });
 
-    <script>
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'px',
-                format: 'a4'
-            });
+        // Load the background image
+        const img = new Image();
+        img.src = 'hall-pass-bg-a.png'; // Make sure the uploaded image matches this name or use the uploaded path
 
-            // Load the background image
-            const img = new Image();
-            img.src = 'hall-pass-bg-a.png';
+        img.onload = function () {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
 
-            img.onload = function() {
-                // Add image as background
-                doc.addImage(img, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+            // Add image as full-page background
+            doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight);
 
-                // Get input values
-                const teacher = document.getElementById("teacher").value;
-                const section = document.getElementById("section").value;
+            // Get input values
+            const teacher = document.getElementById("teacher").value;
+            const section = document.getElementById("section").value;
 
-                // Set text font and size
-                doc.setFont('Helvetica', 'bold');
-                doc.setFontSize(30);
-                doc.setTextColor(255, 255, 255); // white text
+            // Combine into a single line or two lines as needed
+            const label = `${teacher} - ${section}`;
 
-                // Position the teacher name (adjust X, Y to match your image layout)
-                doc.text(`Teacher: ${teacher}`, 60, 700);
+            // Set text style
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(26); // Make it large
+            doc.setTextColor(255, 255, 255); // White text
 
-                // Position the section name (adjust X, Y to match your image layout / box at bottom)
-                doc.text(`Section: ${section}`, 60, 740);
+            // Calculate text width to center it
+            const textWidth = doc.getTextWidth(label);
+            const x = (pageWidth - textWidth) / 2;
+            const y = 860; // Adjust based on the position of the black bar (test and tweak this)
 
-                // Save PDF
-                doc.save("hall-pass.pdf");
-            };
-        }
-    </script>
-</body>
-</html>
+            // Draw text on black bar
+            doc.text(label, x, y);
+
+            // Save PDF
+            doc.save("hall-pass.pdf");
+        };
+    }
+</script>
