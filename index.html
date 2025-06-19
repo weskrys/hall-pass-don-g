@@ -9,10 +9,13 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    input {
+    input, label {
+      display: block;
       margin-bottom: 10px;
-      padding: 5px;
       font-size: 14px;
+    }
+    input[type="text"] {
+      padding: 5px;
       width: 300px;
     }
     button {
@@ -31,8 +34,10 @@
 <body>
   <h2>HALL PASS Generator</h2>
 
-  <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmediana" oninput="updatePreview()" /></label><br />
-  <label>Section Name: <input type="text" id="section" value="12 GAS A" oninput="updatePreview()" /></label><br />
+  <label>Teacher Name: <input type="text" id="teacher" value="Krystill Esmediana" oninput="updatePreview()" /></label>
+  <label>Section Name: <input type="text" id="section" value="12 GAS A" oninput="updatePreview()" /></label>
+  <label><input type="checkbox" id="bgToggle" onchange="updatePreview()" /> Use green background instead of pink</label>
+
   <button onclick="generatePDF()">Generate PDF</button>
 
   <h3>Live Preview:</h3>
@@ -41,29 +46,48 @@
   <script>
     const canvas = document.getElementById("previewCanvas");
     const ctx = canvas.getContext("2d");
-    const bgImg = new Image();
-    bgImg.src = "hall-pass-bg-a.png"; // Ensure this file exists in the same directory
 
-    bgImg.onload = () => {
+    let bgPink = new Image();
+    let bgGreen = new Image();
+    bgPink.src = "hall-pass-bg-a.png";   // Pink background
+    bgGreen.src = "hall-pass-bg-b.png";  // Green background
+
+    let bgLoaded = { pink: false, green: false };
+
+    bgPink.onload = () => {
+      bgLoaded.pink = true;
       updatePreview();
     };
 
+    bgGreen.onload = () => {
+      bgLoaded.green = true;
+      updatePreview();
+    };
+
+    function getCurrentBackground() {
+      return document.getElementById("bgToggle").checked ? bgGreen : bgPink;
+    }
+
     function updatePreview() {
+      const currentBg = getCurrentBackground();
+
+      // Only draw if image is ready
+      if (!currentBg.complete) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(currentBg, 0, 0, canvas.width, canvas.height);
 
       const teacher = document.getElementById("teacher").value;
       const section = document.getElementById("section").value;
 
-      // Section name (slightly smaller than before)
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
 
-      ctx.font = "bold 70px Helvetica"; // 30% smaller than 112px
-      ctx.fillText(section, canvas.width / 2, 740); // Adjusted Y for better balance
+      ctx.font = "bold 70px Helvetica"; // Section
+      ctx.fillText(section, canvas.width / 2, 740);
 
-      ctx.font = "bold 28px Helvetica";
-      ctx.fillText(teacher, canvas.width / 2, 780); // Moved teacher name slightly closer
+      ctx.font = "bold 28px Helvetica"; // Teacher
+      ctx.fillText(teacher, canvas.width / 2, 780);
     }
 
     async function generatePDF() {
