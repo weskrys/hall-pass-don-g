@@ -30,11 +30,11 @@
       <div class="col-md-6">
         <div class="card border-primary">
           <div class="card-body">
-            <form>
+            <form id="hallPassForm" onsubmit="event.preventDefault(); generatePDF();">
               <!-- Teacher Name -->
               <div class="mb-3">
                 <label class="form-label">Adviser's Name</label>
-                <input type="text" id="teacher" class="form-control" placeholder="Enter Adviser Name" oninput="updatePreview()" />
+                <input type="text" id="teacher" class="form-control" placeholder="Enter Adviser Name" oninput="updatePreview()" required />
               </div>
 
               <!-- Grade Level -->
@@ -88,7 +88,7 @@
                 </div>
               </div>
 
-              <button type="button" class="btn btn-primary w-100" onclick="generatePDF()">Generate PDF</button>
+              <button type="submit" class="btn btn-primary w-100">Generate PDF</button>
             </form>
           </div>
         </div>
@@ -129,7 +129,7 @@
     }
 
     function updatePreview() {
-      const teacher = document.getElementById("teacher").value;
+      const teacher = document.getElementById("teacher").value.trim();
       const grade = getSelectedValue("gradeLevel");
       const strand = getSelectedValue("strand");
       const section = getSelectedValue("section");
@@ -158,6 +158,8 @@
         teacherY -= 5;
       }
 
+      teacherFontSize *= 0.95;
+
       if (!background.complete) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -169,10 +171,18 @@
       ctx.fillText(label, canvas.width / 2, labelY);
 
       ctx.font = `bold ${teacherFontSize}px Helvetica`;
-      ctx.fillText(teacher, canvas.width / 2, teacherY);
+      ctx.fillText(`Adviser: ${teacher}`, canvas.width / 2, teacherY);
     }
 
     async function generatePDF() {
+      const teacher = document.getElementById("teacher").value.trim();
+
+      if (!teacher) {
+        alert("Please enter the adviser's name before generating the PDF.");
+        document.getElementById("teacher").focus();
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
 
       const pdfWidth = 1008;  // 14 in * 72 dpi
@@ -195,23 +205,21 @@
       const aspectRatio = canvas.height / canvas.width;
       const scaledHeight = scaledWidth * aspectRatio;
 
-      // Center horizontally within each half page
       const leftX = margin + (halfWidth - scaledWidth) / 2;
       const rightX = margin + halfWidth + (halfWidth - scaledWidth) / 2;
-
-      // Vertically centered
       const yPos = (pdfHeight - scaledHeight) / 2;
 
       doc.addImage(imgData, "PNG", leftX, yPos, scaledWidth, scaledHeight);
       doc.addImage(imgData, "PNG", rightX, yPos, scaledWidth, scaledHeight);
 
-      // Dashed cut line in middle
       const midX = pdfWidth / 2;
       doc.setDrawColor(150);
       doc.setLineDashPattern([4, 4], 0);
       doc.line(midX, margin, midX, pdfHeight - margin);
 
       doc.save("hall-pass-legal.pdf");
+
+      alert("PDF has been generated and saved successfully.");
     }
   </script>
 </body>
